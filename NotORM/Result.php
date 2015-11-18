@@ -193,6 +193,18 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 		}
 		return $this->notORM->connection->quote($val);
 	}
+
+	protected function parseConditions($condition){
+		$matches = array();
+		preg_match_all("/(AND|OR)\W+(NOT\W+)?([\w.]+)/", $condition, $matches, PREG_SET_ORDER);
+		if(count($matches)){
+			foreach($matches as $match){
+				if(count($match) && !empty($match[0])){
+					$this->conditions[] = $match[0];
+				}
+			}
+		}
+	}
 	
 	/** Shortcut for call_user_func_array(array($this, 'insert'), $rows)
 	* @param array
@@ -402,7 +414,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 			return $this;
 		}
 		$this->__destruct();
-		$this->conditions[] = "$operator $condition";
+		$this->parseConditions("$operator $condition");
 		$condition = $this->removeExtraDots($condition);
 		if (count($args) != 2 || strpbrk($condition, "?:")) { // where("column < ? OR column > ?", array(1, 2))
 			if (count($args) != 2 || !is_array($parameters)) { // where("column < ? OR column > ?", 1, 2)
