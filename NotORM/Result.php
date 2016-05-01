@@ -48,7 +48,10 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 		return $return;
 	}
 	
-	protected function removeExtraDots($expression) {
+	protected function removeExtraDots($expression, $joinsAs = false) {
+		if($joinsAs){
+			$expression = preg_replace('~([a-z_]+[a-z0-9_]+:[a-z_*]+)~i', '\1 AS `\1`', $expression);
+		}
 		return preg_replace('~(?:\\b[a-z_][a-z0-9_.:]*[.:])?([a-z_][a-z0-9_]*)[.:]([a-z_*])~i', '\\1.\\2', $expression); // rewrite tab1.tab2.col
 	}
 	
@@ -118,7 +121,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 			$this->access = $this->accessed;
 		}
 		if ($this->select) {
-			$return .= $this->removeExtraDots(implode(", ", $this->select));
+			$return .= $this->removeExtraDots(implode(", ", $this->select), true);
 		} elseif ($this->accessed) {
 			$return .= ($join ? "$this->table." : "") . implode(", " . ($join ? "$this->table." : ""), array_keys($this->accessed));
 		} else {
