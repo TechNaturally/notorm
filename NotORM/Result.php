@@ -244,7 +244,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 			}
 			//! driver specific extended insert
 			$insert = ($data || $this->notORM->driver == "mysql"
-				? "(" . implode(", ", array_keys($data)) . ") VALUES " . implode(", ", $values)
+				? "(`" . implode("`, `", array_keys($data)) . "`) VALUES " . implode(", ", $values)
 				: "DEFAULT VALUES"
 			);
 		}
@@ -319,7 +319,7 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 			$update = $insert;
 		}
 		$insert = $unique + $insert;
-		$values = "(" . implode(", ", array_keys($insert)) . ") VALUES " . $this->quote($insert);
+		$values = "(`" . implode("`, `", array_keys($insert)) . "`) VALUES " . $this->quote($insert);
 		//! parameters
 		if ($this->notORM->driver == "mysql") {
 			$set = array();
